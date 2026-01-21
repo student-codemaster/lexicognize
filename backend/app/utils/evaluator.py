@@ -77,3 +77,108 @@ class BLEUEvaluator:
             'bleu': np.mean(bleu_scores),
             'bleu_std': np.std(bleu_scores)
         }
+
+class ModelEvaluator:
+    """Comprehensive model evaluator combining multiple metrics"""
+    
+    def __init__(self):
+        self.rouge_evaluator = ROUGEEvaluator()
+        self.bleu_evaluator = BLEUEvaluator()
+    
+    def evaluate_model(
+        self, 
+        model_path: str, 
+        dataset: List[Dict], 
+        task: str = "summarization",
+        metrics: List[str] = ["rouge", "bleu"]
+    ) -> Dict[str, Any]:
+        """
+        Comprehensive model evaluation
+        
+        Args:
+            model_path: Path to trained model
+            dataset: Test dataset
+            task: Task type (summarization or simplification)
+            metrics: List of metrics to compute
+            
+        Returns:
+            Dictionary containing evaluation results
+        """
+        results = {
+            "model_path": model_path,
+            "task": task,
+            "dataset_size": len(dataset),
+            "evaluated_samples": min(len(dataset), 100),
+            "metrics": {}
+        }
+        
+        # Compute ROUGE scores
+        if "rouge" in metrics:
+            try:
+                rouge_scores = self.rouge_evaluator.evaluate(model_path, dataset, task)
+                results["metrics"]["rouge"] = rouge_scores
+            except Exception as e:
+                results["metrics"]["rouge"] = {"error": str(e)}
+        
+        # Compute BLEU scores
+        if "bleu" in metrics:
+            try:
+                bleu_scores = self.bleu_evaluator.evaluate(model_path, dataset, task)
+                results["metrics"]["bleu"] = bleu_scores
+            except Exception as e:
+                results["metrics"]["bleu"] = {"error": str(e)}
+        
+        return results
+    
+    def compare_models(
+        self, 
+        model_paths: List[str], 
+        dataset: List[Dict], 
+        task: str = "summarization"
+    ) -> Dict[str, Any]:
+        """
+        Compare multiple models on the same dataset
+        
+        Args:
+            model_paths: List of model paths to compare
+            dataset: Test dataset
+            task: Task type
+            
+        Returns:
+            Comparison results
+        """
+        comparison = {
+            "task": task,
+            "dataset_size": len(dataset),
+            "models": {}
+        }
+        
+        for model_path in model_paths:
+            model_name = model_path.split("/")[-1] if "/" in model_path else model_path
+            results = self.evaluate_model(model_path, dataset, task)
+            comparison["models"][model_name] = results
+        
+        # Find best model for each metric
+        best_models = {}
+        
+        # Compare ROUGE scores
+        rouge_scores = {}
+        for model_name, results in comparison["models"].items():
+            if "rouge" in results["metrics"] and "rouge1" in results["metrics"]["rouge"]:
+                rouge_scores[model_name] = results["metrics"]["rouge"]["rouge1"]
+        
+        if rouge_scores:
+            best_models["rouge1"] = max(rouge_scores, key=rouge_scores.get)
+        
+        # Compare BLEU scores
+        bleu_scores = {}
+        for model_name, results in comparison["models"].items():
+            if "bleu" in results["metrics"] and "bleu" in results["metrics"]["bleu"]:
+                bleu_scores[model_name] = results["metrics"]["bleu"]["bleu"]
+        
+        if bleu_scores:
+            best_models["bleu"] = max(bleu_scores, key=bleu_scores.get)
+        
+        comparison["best_models"] = best_models
+        
+        return comparison

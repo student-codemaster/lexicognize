@@ -38,7 +38,7 @@ class MultiTaskDataset(Dataset):
         if self.task == "summary":
             source = item.get("text", "")
             target = item.get("summary", "")
-        elif self.task == "simplify":
+        elif self.task == "simplification":
             source = item.get("text", "")
             target = item.get("simplified", item.get("summary", ""))
         else:  # both - alternate between tasks
@@ -318,3 +318,44 @@ class MultiModelTrainer:
         }
         
         return results
+    
+    def generate_summary(self, text: str, model_path: Optional[str] = None, max_length: int = 256) -> str:
+        """Generate summary for a single text"""
+        if model_path:
+            from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+            
+            tokenizer = AutoTokenizer.from_pretrained(model_path)
+            model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
+        else:
+            model = self.model
+            tokenizer = self.tokenizer
+        
+        model.to(self.device)
+        model.eval()
+        
+        # Tokenize input
+        inputs = tokenizer(
+            text,
+            max_length=1024,
+            padding="max_length",
+            truncation=True,
+            return_tensors="pt"
+        )
+        
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
+        
+        # Generate summary
+        with torch.no_grad():
+            outputs = model.generate(
+                input_ids=inputs["input_ids"],
+                attention_mask=inputs["attention_mask"],
+                max_length=max_length,
+                num_beams=4,
+                temperature=1.0,
+                do_sample=False,
+                early_stopping=True
+            )
+        
+        # Decode summary
+        summary = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        return summary
