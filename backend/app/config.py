@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL", 
-        "postgresql://postgres:password@localhost/legal_models"
+        "sqlite:///./legal_models.db"
     )
     DATABASE_TEST_URL: Optional[str] = os.getenv("DATABASE_TEST_URL")
     

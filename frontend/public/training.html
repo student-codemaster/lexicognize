@@ -1,0 +1,464 @@
+<!-- LexiCognize Training Interface -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexiCognize - Model Training Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            padding: 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .status-box {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .status-value {
+            color: #333;
+            margin-top: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .metric {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .endpoints {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .endpoints h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .endpoint {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .endpoint-method {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .success {
+            border-left-color: #4caf50;
+        }
+
+        .info {
+            border-left-color: #2196f3;
+        }
+
+        .warning {
+            border-left-color: #ff9800;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ LexiCognize</h1>
+            <p>Legal Model Fine-Tuning & Training Platform</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Column: Training Section -->
+            <div>
+                <div class="section">
+                    <h2>📊 Start Training</h2>
+                    
+                    <div class="form-group">
+                        <label for="model">Select Model</label>
+                        <select id="model">
+                            <option value="BART">BART (Summarization)</option>
+                            <option value="PEGASUS">PEGASUS (Summarization)</option>
+                            <option value="Multilingual">Multilingual T5 (Translation)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="epochs">Epochs</label>
+                        <input type="number" id="epochs" value="3" min="1" max="20">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="batch">Batch Size</label>
+                        <input type="number" id="batch" value="4" min="1" max="64">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lr">Learning Rate</label>
+                        <input type="text" id="lr" value="5e-5">
+                    </div>
+
+                    <button onclick="startTraining()">🚀 Start Training</button>
+                </div>
+
+                <div class="section">
+                    <h2>📤 Upload Dataset</h2>
+                    
+                    <div class="form-group">
+                        <label for="dataset">Select Dataset File (CSV)</label>
+                        <input type="file" id="dataset" accept=".csv,.json">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="datasetName">Dataset Name</label>
+                        <input type="text" id="datasetName" placeholder="e.g., Legal Summarization 2026">
+                    </div>
+
+                    <button onclick="uploadDataset()">📤 Upload Dataset</button>
+                </div>
+            </div>
+
+            <!-- Right Column: Status Section -->
+            <div>
+                <div class="section">
+                    <h2>📈 Training Status</h2>
+                    
+                    <div class="status-box">
+                        <div class="status-label">Current Job</div>
+                        <div class="status-value" id="jobStatus">No active job</div>
+                    </div>
+
+                    <div class="status-box">
+                        <div class="status-label">Progress</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                        </div>
+                        <div class="status-value" id="progressText">0%</div>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-label">Epoch</div>
+                            <div class="metric-value" id="epochValue">-</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Loss</div>
+                            <div class="metric-value" id="lossValue">-</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Accuracy</div>
+                            <div class="metric-value" id="accuracyValue">-</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Status</div>
+                            <div class="metric-value" id="statusValue">Idle</div>
+                        </div>
+                    </div>
+
+                    <button onclick="refreshStatus()" style="margin-top: 15px;">🔄 Refresh Status</button>
+                </div>
+
+                <div class="section">
+                    <h2>🔮 Make Prediction</h2>
+                    
+                    <div class="form-group">
+                        <label for="predictText">Input Text</label>
+                        <textarea id="predictText" rows="4" placeholder="Enter legal text to process..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="predictModel">Model</label>
+                        <select id="predictModel">
+                            <option value="BART">BART</option>
+                            <option value="PEGASUS">PEGASUS</option>
+                            <option value="Multilingual">Multilingual</option>
+                        </select>
+                    </div>
+
+                    <button onclick="makePrediction()">⚡ Predict</button>
+
+                    <div class="status-box" style="margin-top: 15px; display:none;" id="predictionResult">
+                        <div class="status-label">Result</div>
+                        <div class="status-value" id="predictionOutput"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Endpoints Reference -->
+        <div class="endpoints">
+            <h3>🔗 Available API Endpoints</h3>
+            
+            <div class="endpoint success">
+                <span class="endpoint-method">GET</span> /api/training/models - List available models
+            </div>
+            
+            <div class="endpoint success">
+                <span class="endpoint-method">POST</span> /api/training/start - Start training
+            </div>
+            
+            <div class="endpoint success">
+                <span class="endpoint-method">GET</span> /api/training/jobs - List training jobs
+            </div>
+            
+            <div class="endpoint success">
+                <span class="endpoint-method">GET</span> /api/training/jobs/{id} - Job details
+            </div>
+            
+            <div class="endpoint info">
+                <span class="endpoint-method">POST</span> /api/training/upload-dataset - Upload dataset
+            </div>
+            
+            <div class="endpoint info">
+                <span class="endpoint-method">POST</span> /api/inference/predict - Make prediction
+            </div>
+            
+            <div class="endpoint warning">
+                <span class="endpoint-method">POST</span> /api/training/evaluate - Evaluate model
+            </div>
+
+            <p style="margin-top: 15px; color: #666; font-size: 0.9em;">
+                API URL: http://127.0.0.1:8001<br>
+                Full Docs: <a href="http://127.0.0.1:8001/api/docs" target="_blank">Swagger UI</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8001';
+
+        async function startTraining() {
+            const model = document.getElementById('model').value;
+            const epochs = document.getElementById('epochs').value;
+            const batch = document.getElementById('batch').value;
+            const lr = document.getElementById('lr').value;
+
+            try {
+                const response = await fetch(
+                    `${API_URL}/api/training/start?model=${model}&epochs=${epochs}&batch_size=${batch}&learning_rate=${lr}`,
+                    { method: 'POST' }
+                );
+                const data = await response.json();
+                
+                document.getElementById('jobStatus').textContent = `Job #${data.job_id} - ${data.status}`;
+                alert('✓ Training started! Check status below.');
+            } catch (error) {
+                alert('✗ Error: ' + error.message);
+            }
+        }
+
+        async function uploadDataset() {
+            const file = document.getElementById('dataset').files[0];
+            const name = document.getElementById('datasetName').value;
+
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${API_URL}/api/training/upload-dataset`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                alert('✓ Dataset uploaded: ' + data.filename);
+            } catch (error) {
+                alert('✗ Error: ' + error.message);
+            }
+        }
+
+        async function refreshStatus() {
+            try {
+                const response = await fetch(`${API_URL}/api/training/jobs/1`);
+                const data = await response.json();
+                
+                document.getElementById('progressFill').style.width = data.progress + '%';
+                document.getElementById('progressText').textContent = data.progress + '%';
+                document.getElementById('epochValue').textContent = `${data.epoch}/${data.total_epochs}`;
+                document.getElementById('lossValue').textContent = data.loss.toFixed(2);
+                document.getElementById('accuracyValue').textContent = (data.accuracy * 100).toFixed(1) + '%';
+                document.getElementById('statusValue').textContent = data.status;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function makePrediction() {
+            const text = document.getElementById('predictText').value;
+            const model = document.getElementById('predictModel').value;
+
+            if (!text) {
+                alert('Please enter text');
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `${API_URL}/api/inference/predict?text=${encodeURIComponent(text)}&model=${model}`,
+                    { method: 'POST' }
+                );
+                const data = await response.json();
+                
+                document.getElementById('predictionOutput').textContent = data.output;
+                document.getElementById('predictionResult').style.display = 'block';
+            } catch (error) {
+                alert('✗ Error: ' + error.message);
+            }
+        }
+
+        // Auto-refresh every 10 seconds
+        setInterval(refreshStatus, 10000);
+    </script>
+</body>
+</html>

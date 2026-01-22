@@ -1,6 +1,6 @@
 from sqlalchemy import (
     Column, Integer, String, Boolean, DateTime, 
-    Text, ForeignKey, Enum, JSON, LargeBinary
+    Text, ForeignKey, Enum, JSON, LargeBinary, Float
 )
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -191,7 +191,7 @@ class UserDataset(Base):
     original_filename = Column(String(255))
     
     # Dataset metadata
-    metadata = Column(JSON, default=lambda: {
+    metadata_info = Column(JSON, default=lambda: {
         "samples": 0,
         "languages": ["en"],
         "categories": [],
@@ -239,7 +239,7 @@ class UserModel(Base):
     dataset_id = Column(Integer, ForeignKey("user_datasets.id"))
     
     # Metadata
-    metadata = Column(JSON, default=lambda: {
+    metadata_info = Column(JSON, default=lambda: {
         "epochs": 3,
         "batch_size": 4,
         "learning_rate": 5e-5,

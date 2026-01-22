@@ -115,7 +115,7 @@ async def refresh_token(
     
     return tokens
 
-@router.post("/logout")
+@router.post("/logout", response_model=None)
 async def logout(
     refresh_token: str,
     db: Session = Depends(get_db)
@@ -130,7 +130,7 @@ async def logout(
     
     return {"message": "Successfully logged out"}
 
-@router.post("/logout-all")
+@router.post("/logout-all", response_model=None)
 async def logout_all(
     current_user: schemas.UserInDB = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -168,7 +168,7 @@ async def update_current_user(
     
     return updated_user
 
-@router.post("/change-password")
+@router.post("/change-password", response_model=None)
 async def change_password(
     password_data: schemas.ChangePasswordRequest,
     current_user: schemas.UserInDB = Depends(get_current_user),
@@ -195,7 +195,7 @@ async def change_password(
     
     return {"message": "Password changed successfully"}
 
-@router.post("/forgot-password")
+@router.post("/forgot-password", response_model=None)
 async def forgot_password(
     reset_request: schemas.PasswordResetRequest,
     background_tasks: BackgroundTasks,
@@ -219,7 +219,7 @@ async def forgot_password(
     
     return {"message": "If the email exists, a reset link will be sent"}
 
-@router.post("/reset-password")
+@router.post("/reset-password", response_model=None)
 async def reset_password(
     reset_data: schemas.PasswordResetConfirm,
     db: Session = Depends(get_db)
@@ -249,7 +249,7 @@ async def reset_password(
     
     return {"message": "Password reset successfully"}
 
-@router.post("/verify-email")
+@router.post("/verify-email", response_model=None)
 async def verify_email(
     verification_request: schemas.EmailVerificationRequest,
     db: Session = Depends(get_db)
@@ -273,7 +273,7 @@ async def verify_email(
     
     return {"message": "Email verified successfully"}
 
-@router.post("/resend-verification")
+@router.post("/resend-verification", response_model=None)
 async def resend_verification(
     background_tasks: BackgroundTasks,
     current_user: schemas.UserInDB = Depends(get_current_user),
@@ -392,7 +392,7 @@ async def get_user_stats(
     return stats
 
 # Health check
-@router.get("/health")
+@router.get("/health", response_model=None)
 async def health_check():
     """Health check endpoint."""
     return {"status": "healthy", "service": "auth"}
